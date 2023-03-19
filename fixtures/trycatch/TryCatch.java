@@ -4,6 +4,13 @@ import java.io.IOException;
 
 class TryCatch {
 	
+    static{
+        try {
+        	
+        } catch(Exception e) {
+	    }
+	}
+	
 	public void m1() {
 		try {
 

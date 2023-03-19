@@ -9,7 +9,6 @@ import org.junit.jupiter.api.TestInstance;
 public class NumberOfTryCatchesTest extends BaseTest {
 
 	private CKClassResult result;
-
 	
 	@BeforeAll
 	public void setUp() {
@@ -17,11 +16,10 @@ public class NumberOfTryCatchesTest extends BaseTest {
 		result = report.get("trycatch.TryCatch");
 	}
 	
-	
 	@Test
 	public void countClass() {
-		Assertions.assertEquals(5, result.getTryQty());
-		Assertions.assertEquals(6, result.getCatchQty());
+		Assertions.assertEquals(6, result.getTryQty());
+		Assertions.assertEquals(7, result.getCatchQty());
 	}
 
 	@Test
