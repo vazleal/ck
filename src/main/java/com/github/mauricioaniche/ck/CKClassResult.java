@@ -44,6 +44,7 @@ public class CKClassResult {
 	private int innerClassesQty;
 	private int lambdasQty;
 	private int uniqueWordsQty;
+	private int nullCheckQty;
 	private int numberOfMethods;
 	private int numberOfStaticMethods;
 	private int numberOfPublicMethods;
@@ -546,6 +547,14 @@ public class CKClassResult {
 
 	public void setCatchQty(int catchQty) {
 		this.catchQty = catchQty;
+	}
+
+	public int getNullCheckQty() {
+		return nullCheckQty;
+	}
+
+	public void setNullCheckQty(int nullCheckQty) {
+		this.nullCheckQty = nullCheckQty;
 	}
 
 }

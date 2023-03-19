@@ -41,6 +41,7 @@ public class CKMethodResult {
 	private boolean isConstructor;
 	private int modifiers;
 	private int logStatementsQty;
+	private int nullCheckQty;
 	private boolean hasJavadoc;
 
 	//All direct invocations of methods
@@ -390,4 +391,11 @@ public class CKMethodResult {
 		return Objects.hash(methodName, startLine);
 	}
 
+	public int getNullCheckQty() {
+		return nullCheckQty;
+	}
+
+	public void setNullCheckQty(int nullCheckQty) {
+		this.nullCheckQty = nullCheckQty;
+	}
 }
