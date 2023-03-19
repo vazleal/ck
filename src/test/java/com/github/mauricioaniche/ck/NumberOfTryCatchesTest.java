@@ -5,26 +5,52 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.util.Map;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class NumberOfTryCatchesTest extends BaseTest {
 
+	private CKClassResult result;
+
+	
 	@BeforeAll
 	public void setUp() {
 		report = run(fixturesDir() + "/trycatch");
+		result = report.get("trycatch.TryCatch");
+	}
+	
+	
+	@Test
+	public void countClass() {
+		Assertions.assertEquals(5, result.getTryQty());
+		Assertions.assertEquals(6, result.getCatchQty());
 	}
 
 	@Test
-	public void count() {
-		CKClassResult a = report.get("trycatch.TryCatch");
+	public void countNestedTry() {
+		Assertions.assertEquals(2, result.getMethod("m1/0").get().getTryQty());
+		Assertions.assertEquals(2, result.getMethod("m1/0").get().getCatchQty());
+	}
 
-		Assertions.assertEquals(4, a.getTryCatchQty());
+	@Test
+	public void countTryCatchFinally() {
+		Assertions.assertEquals(1, result.getMethod("m2/0").get().getTryQty());
+		Assertions.assertEquals(1, result.getMethod("m2/0").get().getCatchQty());
+	}
 
-		Assertions.assertEquals(2, a.getMethod("m1/0").get().getTryCatchQty());
-		Assertions.assertEquals(1, a.getMethod("m2/0").get().getTryCatchQty());
-		Assertions.assertEquals(1, a.getMethod("m3/0").get().getTryCatchQty());
-		Assertions.assertEquals(0, a.getMethod("m4/0").get().getTryCatchQty());
+	@Test
+	public void countTryCatchTwoExceptions() {
+		Assertions.assertEquals(1, result.getMethod("m3/0").get().getTryQty());
+		Assertions.assertEquals(1, result.getMethod("m3/0").get().getCatchQty());
+	}
 
+	@Test
+	public void countNoTryStatement() {
+		Assertions.assertEquals(0, result.getMethod("m4/0").get().getTryQty());
+		Assertions.assertEquals(0, result.getMethod("m4/0").get().getCatchQty());
+	}
+	
+	@Test
+	public void countTryMultipleCatches() {
+		Assertions.assertEquals(1, result.getMethod("m5/0").get().getTryQty());
+		Assertions.assertEquals(2, result.getMethod("m5/0").get().getCatchQty());
 	}
 }

@@ -31,7 +31,8 @@ public class CKClassResult {
 	private int returnQty;
 	private int loopQty;
 	private int comparisonsQty;
-	private int tryCatchQty;
+	private int tryQty;
+	private int catchQty;
 	private int parenthesizedExpsQty;
 	private int stringLiteralsQty;
 	private int numbersQty;
@@ -262,12 +263,12 @@ public class CKClassResult {
 		return comparisonsQty;
 	}
 
-	public void setTryCatchQty(int tryCatchQty) {
-		this.tryCatchQty = tryCatchQty;
+	public void setTryQty(int tryCatchQty) {
+		this.tryQty = tryCatchQty;
 	}
 
-	public int getTryCatchQty() {
-		return tryCatchQty;
+	public int getTryQty() {
+		return tryQty;
 	}
 
 	public void setParenthesizedExpsQty(int parenthesizedExpsQty) {
@@ -537,6 +538,14 @@ public class CKClassResult {
 	@Override
 	public int hashCode() {
 		return Objects.hash(file, className, type);
+	}
+
+	public int getCatchQty() {
+		return catchQty;
+	}
+
+	public void setCatchQty(int catchQty) {
+		this.catchQty = catchQty;
 	}
 
 }

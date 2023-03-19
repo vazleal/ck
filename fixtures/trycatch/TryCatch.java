@@ -1,5 +1,7 @@
 package trycatch;
 
+import java.io.IOException;
+
 class TryCatch {
 	
 	public void m1() {
@@ -35,6 +37,15 @@ class TryCatch {
 	}
 
 	public void m4() {
-		
+	}
+	
+	public void m5() {
+		try {
+			
+		} catch(IndexOutOfBoundsException e1) {
+			
+		} catch(IOException e2) {
+
+		}
 	}
 }

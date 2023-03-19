@@ -24,7 +24,8 @@ public class CKMethodResult {
 	private int startLine;
 	private int loopQty;
 	private int comparisonsQty;
-	private int tryCatchQty;
+	private int tryQty;
+	private int catchQty;
 	private int parenthesizedExpsQty;
 	private int stringLiteralsQty;
 	private int numbersQty;
@@ -214,12 +215,20 @@ public class CKMethodResult {
 		return comparisonsQty;
 	}
 
-	public void setTryCatchQty(int tryCatchQty) {
-		this.tryCatchQty = tryCatchQty;
+	public void setTryQty(int tryQty) {
+		this.tryQty = tryQty;
 	}
 
-	public int getTryCatchQty() {
-		return tryCatchQty;
+	public int getTryQty() {
+		return tryQty;
+	}
+	
+	public void setCatchQty(int catchQty) {
+		this.catchQty = catchQty;
+	}
+
+	public int getCatchQty() {
+		return catchQty;
 	}
 
 	public void setParenthesizedExpsQty(int parenthesizedExpsQty) {

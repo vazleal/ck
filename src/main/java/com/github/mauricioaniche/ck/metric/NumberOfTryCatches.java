@@ -2,24 +2,34 @@ package com.github.mauricioaniche.ck.metric;
 
 import com.github.mauricioaniche.ck.CKClassResult;
 import com.github.mauricioaniche.ck.CKMethodResult;
+
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.TryStatement;
 
 public class NumberOfTryCatches implements CKASTVisitor, ClassLevelMetric, MethodLevelMetric {
 
-	private int qty = 0;
+	private int tryQty = 0;
+	
+	private int catchQty = 0;
 
 	public void visit(TryStatement node) {
-		qty++;
+		tryQty++;
 	}
 
+	public void visit(CatchClause node) {
+		catchQty++;
+	}
+	
 	@Override
 	public void setResult(CKMethodResult result) {
-		result.setTryCatchQty(qty);
+		result.setTryQty(tryQty);
+		result.setCatchQty(catchQty);
 
 	}
 
 	@Override
 	public void setResult(CKClassResult result) {
-		result.setTryCatchQty(qty);
+		result.setTryQty(tryQty);
+		result.setCatchQty(catchQty);
 	}
 }
