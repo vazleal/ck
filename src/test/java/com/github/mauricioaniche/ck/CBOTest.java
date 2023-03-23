@@ -138,4 +138,85 @@ public class CBOTest extends BaseTest {
 		CKClassResult a = report.get("cbo.Coupling11");
 		Assertions.assertEquals(6, a.getCbo());
 	}
+	
+	@Test
+	public void couplingWithAncestorClass() {
+		CKClassResult resultSource = report.get("cbo.LocalInheritanceCouplingSourceClass");
+		CKClassResult resultTarget = report.get("cbo.LocalInheritanceCouplingTargetClass");
+		Assertions.assertEquals(1, resultSource.getCbo());
+		Assertions.assertEquals(1, resultSource.getCboModified());
+		Assertions.assertEquals(0, resultTarget.getCbo());
+		Assertions.assertEquals(1, resultTarget.getCboModified());
+	}
+	
+	@Test
+	public void couplingWithForeignAncestorClass() {
+		CKClassResult resultAncestor = report.get("cbo.ForeignInheritanceCouplingAncestorClass");
+		CKClassResult resultTarget = report.get("cbo.ForeignInheritanceCouplingTargetClass");
+		CKClassResult resultSource = report.get("cbo.ForeignInheritanceCouplingSourceClass");
+		Assertions.assertEquals(0, resultAncestor.getCbo());
+		Assertions.assertEquals(2, resultAncestor.getCboModified());
+		Assertions.assertEquals(2, resultSource.getCbo());
+		Assertions.assertEquals(2, resultSource.getCboModified());
+		Assertions.assertEquals(1, resultTarget.getCbo());
+		Assertions.assertEquals(2, resultTarget.getCboModified());
+	}
+	
+	@Test
+	public void couplingWithAbstractClass() {
+		CKClassResult resultTarget = report.get("cbo.AbstractCouplingTargetClass");
+		CKClassResult resultSource = report.get("cbo.AbstractCouplingSourceClass");
+		CKClassResult resultDesdendent1 = report.get("cbo.AbstractCouplingDescendent1Class");
+		CKClassResult resultDesdendent2 = report.get("cbo.AbstractCouplingDescendent2Class");
+		Assertions.assertEquals(2, resultSource.getCbo());
+		Assertions.assertEquals(2, resultSource.getCboModified());
+		Assertions.assertEquals(0, resultTarget.getCbo());
+		Assertions.assertEquals(3, resultTarget.getCboModified());
+		Assertions.assertEquals(1, resultDesdendent1.getCbo());
+		Assertions.assertEquals(2, resultDesdendent1.getCboModified());
+		Assertions.assertEquals(1, resultDesdendent2.getCbo());
+		Assertions.assertEquals(1, resultDesdendent2.getCboModified());
+	}
+	
+	@Test
+	public void couplingWithOverridenClassCallRoot() {
+		CKClassResult resultTarget = report.get("cbo.OverridenCouplingCallRootTargetClass");
+		CKClassResult resultSource = report.get("cbo.OverridenCouplingCallRootSourceClass");
+		CKClassResult resultDesdendent1 = report.get("cbo.OverridenCouplingCallRootDescendent1Class");
+		CKClassResult resultDesdendent2 = report.get("cbo.OverridenCouplingCallRootDescendent2Class");
+		Assertions.assertEquals(1, resultSource.getCbo());
+		Assertions.assertEquals(1, resultSource.getCboModified());
+		Assertions.assertEquals(0, resultTarget.getCbo());
+		Assertions.assertEquals(3, resultTarget.getCboModified());
+		Assertions.assertEquals(1, resultDesdendent1.getCbo());
+		Assertions.assertEquals(1, resultDesdendent1.getCboModified());
+		Assertions.assertEquals(1, resultDesdendent2.getCbo());
+		Assertions.assertEquals(1, resultDesdendent2.getCboModified());
+	}
+	
+	@Test
+	public void couplingWithOverridenClassCallDescendent() {
+		CKClassResult resultTarget = report.get("cbo.OverridenCouplingCallDescendentTargetClass");
+		CKClassResult resultSource = report.get("cbo.OverridenCouplingCallDescendentSourceClass");
+		CKClassResult resultDesdendent1 = report.get("cbo.OverridenCouplingCallDescendentDescendent1Class");
+		CKClassResult resultDesdendent2 = report.get("cbo.OverridenCouplingCallDescendentDescendent2Class");
+		Assertions.assertEquals(2, resultSource.getCbo());
+		Assertions.assertEquals(2, resultSource.getCboModified());
+		Assertions.assertEquals(0, resultTarget.getCbo());
+		Assertions.assertEquals(3, resultTarget.getCboModified());
+		Assertions.assertEquals(1, resultDesdendent1.getCbo());
+		Assertions.assertEquals(2, resultDesdendent1.getCboModified());
+		Assertions.assertEquals(1, resultDesdendent2.getCbo());
+		Assertions.assertEquals(1, resultDesdendent2.getCboModified());
+	}
+	
+	@Test
+	public void couplingWithAncestorByConstructor() {
+		CKClassResult resultSource = report.get("cbo.ConstructorCouplingSourceClass");
+		CKClassResult resultTarget = report.get("cbo.ConstructorCouplingTargetClass");
+		Assertions.assertEquals(1, resultSource.getCbo());
+		Assertions.assertEquals(1, resultSource.getCboModified());
+		Assertions.assertEquals(0, resultTarget.getCbo());
+		Assertions.assertEquals(1, resultTarget.getCboModified());
+	}
 }
