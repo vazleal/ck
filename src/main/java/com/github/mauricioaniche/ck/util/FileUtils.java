@@ -61,7 +61,6 @@ public class FileUtils {
     try {
       return Files.isHidden(path);
     } catch (IOException exception) {
-      exception.printStackTrace();
       return false;
     }
   }
