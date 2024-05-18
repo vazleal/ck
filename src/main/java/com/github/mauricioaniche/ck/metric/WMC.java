@@ -10,99 +10,99 @@ import java.util.*;
 public class WMC implements CKASTVisitor, ClassLevelMetric, MethodLevelMetric {
 
 	protected int cc = 0;
-	// this stack helps us in knowing whether we could evaluate InfixExpressions or not
-	// if we count the conditions directly in the branch node (e.g., if, for, ...), then
+	// this stack helps us in knowing whether we could evaluate InfixExpressions or
+	// not
+	// if we count the conditions directly in the branch node (e.g., if, for, ...),
+	// then
 	// do not need to (re-)count the Infix agains
 	// this is needed for some inline conditions, e.g., boolean x = a > 10;
 	private LinkedList<ASTNode> stack = new LinkedList<>();
 
 	@Override
 	public void visit(MethodDeclaration node) {
-
 		// plus 1 for the method itself
 		increaseCc();
 	}
 
-    @Override
-    public void visit(ForStatement node) {
-	    increaseCCFromExpression(node.getExpression());
+	@Override
+	public void visit(ForStatement node) {
+		increaseCCFromExpression(node.getExpression());
 
-    	stack.push(node);
-    }
+		stack.push(node);
+	}
 
 	@Override
-    public void visit(EnhancedForStatement node) {
-	    increaseCCFromExpression(node.getExpression());
+	public void visit(EnhancedForStatement node) {
+		increaseCCFromExpression(node.getExpression());
 
-	    stack.push(node);
-    }
-    
-    @Override
-    public void visit(ConditionalExpression node) {
+		stack.push(node);
+	}
+
+	@Override
+	public void visit(ConditionalExpression node) {
 
 		increaseCCFromExpression(node.getExpression());
 
 		stack.push(node);
-    }
-    
-    @Override
-    public void visit(DoStatement node) {
-	    increaseCCFromExpression(node.getExpression());
+	}
 
-	    stack.push(node);
-    }
+	@Override
+	public void visit(DoStatement node) {
+		increaseCCFromExpression(node.getExpression());
 
-    @Override
-    public void visit(WhileStatement node) {
-	    increaseCCFromExpression(node.getExpression());
+		stack.push(node);
+	}
 
-	    stack.push(node);
-    }
-    
-    @Override
-    public void visit(SwitchCase node) {
+	@Override
+	public void visit(WhileStatement node) {
+		increaseCCFromExpression(node.getExpression());
 
-		if(!node.isDefault()) {
+		stack.push(node);
+	}
+
+	@Override
+	public void visit(SwitchCase node) {
+
+		if (!node.isDefault()) {
 			increaseCCFromExpression(node.getExpression());
 		}
 
-	    stack.push(node);
-    }
+		stack.push(node);
+	}
 
 	@Override
 	public void visit(InfixExpression node) {
+		if (stack.isEmpty()) {
+			Set<InfixExpression.Operator> operatorsToConsider = new HashSet<>();
+			Collections.addAll(operatorsToConsider,
+					InfixExpression.Operator.LESS,
+					InfixExpression.Operator.GREATER,
+					InfixExpression.Operator.LESS_EQUALS,
+					InfixExpression.Operator.GREATER_EQUALS,
+					InfixExpression.Operator.EQUALS,
+					InfixExpression.Operator.NOT_EQUALS);
 
-		if(stack.isEmpty()) {
-			Set<InfixExpression.Operator> operatorsToConsider = new HashSet<InfixExpression.Operator>() {{
-				add(InfixExpression.Operator.LESS);
-				add(InfixExpression.Operator.GREATER);
-				add(InfixExpression.Operator.LESS_EQUALS);
-				add(InfixExpression.Operator.GREATER_EQUALS);
-				add(InfixExpression.Operator.EQUALS);
-				add(InfixExpression.Operator.NOT_EQUALS);
-			}};
-
-			if (operatorsToConsider.contains(node.getOperator()))
+			if (operatorsToConsider.contains(node.getOperator())) {
 				increaseCc();
+			}
 		}
 	}
 
-    @Override
-    public void visit(Initializer node) {
-    	increaseCc();
-    }
+	@Override
+	public void visit(Initializer node) {
+		increaseCc();
+	}
 
+	@Override
+	public void visit(CatchClause node) {
+		increaseCc();
+	}
 
-    @Override
-    public void visit(CatchClause node) {
-    	increaseCc();
-    }
+	public void visit(IfStatement node) {
 
-    public void visit(IfStatement node) {
-
-	    increaseCCFromExpression(node.getExpression());
-	    stack.push(node);
-    }
+		increaseCCFromExpression(node.getExpression());
+		stack.push(node);
+	}
 
 	@Override
 	public void endVisit(ForStatement node) {
@@ -145,12 +145,12 @@ public class WMC implements CKASTVisitor, ClassLevelMetric, MethodLevelMetric {
 	}
 
 	private int increaseCCFromExpression(Expression expression) {
-		if(expression==null) {
+		if (expression == null) {
 			increaseCc();
 			return 0;
 		}
 
-		if(!containsIfTenary(expression)) {
+		if (!containsIfTenary(expression)) {
 			increaseCc();
 		}
 
@@ -162,12 +162,11 @@ public class WMC implements CKASTVisitor, ClassLevelMetric, MethodLevelMetric {
 		return ands + ors;
 	}
 
-
 	private boolean containsIfTenary(Expression expression) {
-		if(expression instanceof ParenthesizedExpression) {
+		if (expression instanceof ParenthesizedExpression) {
 			ParenthesizedExpression x = (ParenthesizedExpression) expression;
 			return containsIfTenary(x.getExpression());
-		} else if(expression instanceof InfixExpression) {
+		} else if (expression instanceof InfixExpression) {
 			InfixExpression x = (InfixExpression) expression;
 			return containsIfTenary(x.getLeftOperand()) || containsIfTenary(x.getRightOperand());
 		} else if (expression instanceof ConditionalExpression) {
@@ -179,12 +178,12 @@ public class WMC implements CKASTVisitor, ClassLevelMetric, MethodLevelMetric {
 	}
 
 	private void increaseCc() {
-    	increaseCc(1);
-    }
+		increaseCc(1);
+	}
 
-    protected void increaseCc(int qtd) {
-    	cc += qtd;
-    }
+	protected void increaseCc(int qtd) {
+		cc += qtd;
+	}
 
 	@Override
 	public void setResult(CKClassResult result) {

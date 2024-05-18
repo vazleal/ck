@@ -10,3 +10,4 @@ target/
 .idea/
 *.iml
 .vscode
+sonar-scanner-5.0.1.3006-windows

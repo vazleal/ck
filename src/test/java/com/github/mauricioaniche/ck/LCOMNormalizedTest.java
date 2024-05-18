@@ -9,18 +9,17 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class LCOMNormalizedTest extends BaseTest{
-	
+public class LCOMNormalizedTest extends BaseTest {
+
 	@BeforeAll
 	public void setUp() {
 		report = run(fixturesDir() + "/lcom");
 	}
-	
+
 	@Test
 	public void should_count_lcom() {
-				
 		CKClassResult a = report.get("lcom.TripStatusBean");
-		BigDecimal db = new BigDecimal(a.getLcomNormalized()).setScale(4, RoundingMode.HALF_UP);
+		BigDecimal db = BigDecimal.valueOf(a.getLcomNormalized()).setScale(4, RoundingMode.HALF_UP);
 		Assertions.assertEquals(0.9615, db.doubleValue());
 
 		CKClassResult b = report.get("lcom.SimpleGetterAndSetter");
@@ -31,7 +30,5 @@ public class LCOMNormalizedTest extends BaseTest{
 
 		CKClassResult d = report.get("lcom.TermsOfServiceController");
 		Assertions.assertEquals(0.0, d.getLcomNormalized());
-
 	}
-	
 }
