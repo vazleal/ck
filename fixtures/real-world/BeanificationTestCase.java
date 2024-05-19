@@ -381,7 +381,6 @@ public class BeanificationTestCase extends TestCase {
 					}, Integer.TYPE);
 					BeanUtils.setProperty(bean, "int", new Integer(1));
 				} catch (final Exception e) {
-					e.printStackTrace();
 					signal.setException(e);
 				}
 			}

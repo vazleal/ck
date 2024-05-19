@@ -5,23 +5,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ClassTypeTest extends BaseTest {
-
-	private static Map<String, CKClassResult> report;
-
+class ClassTypeTest extends BaseTest {
+	
 	@BeforeAll
 	public void setUp() {
 		report = run(fixturesDir() + "/class-types");
 	}
 
-
 	@Test
-	public void identifyTypesCorrectly() {
+	void identifyTypesCorrectly() {
 
 		Assertions.assertEquals(5, report.size());
 
@@ -39,9 +32,5 @@ public class ClassTypeTest extends BaseTest {
 
 		CKClassResult anon2 = report.get("classtypes.A$Anonymous2");
 		Assertions.assertEquals("anonymous", anon2.getType());
-
-
 	}
-
-
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class FileUtils {
-	protected static final List<String> IGNORED_DIRECTORIES = new ArrayList<>();
+	public static final List<String> IGNORED_DIRECTORIES = new ArrayList<>();
 
 	// Initialize ignored directories with .git.
 	static {
