@@ -4,11 +4,9 @@ import org.eclipse.jdt.core.dom.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class CouplingCalculator {
-    private static final Logger logger = Logger.getLogger(CouplingCalculator.class.getName());
     private Set<String> coupling = new HashSet<>();
 
     public void coupleTo(Type type) {
