@@ -12,43 +12,57 @@ public class Runner {
 
 	private static final Logger logger = Logger.getLogger(Runner.class.getName());
 
-	public static void main(String[] args) throws IOException {
-
+	private void validateArgs(String[] args) {
 		if (args == null || args.length < 1) {
 			logger.severe(
 					"Usage: java -jar ck.jar <path to project> <use Jars=true|false> <max files per partition, 0=automatic selection> <print variables and fields metrics? True|False> <path to save the output files>");
 			System.exit(1);
 		}
+	}
 
-		@SuppressWarnings("null")
-		String path = args[0];
-
-		boolean useJars = false;
+	private boolean shouldUseJars(String[] args) {
 		if (args.length >= 2)
-			useJars = Boolean.parseBoolean(args[1]);
+			return Boolean.parseBoolean(args[1]);
+		return false;
+	}
 
-		int maxAtOnce = 0;
+	private int getMaxAtOnce(String[] args) {
 		if (args.length >= 3)
-			maxAtOnce = Integer.parseInt(args[2]);
+			return Integer.parseInt(args[2]);
+		return 0;
+	}
 
-		boolean variablesAndFields = true;
+	private boolean getVariablesAndFields(String[] args) {
 		if (args.length >= 4)
-			variablesAndFields = Boolean.parseBoolean(args[3]);
+			return Boolean.parseBoolean(args[3]);
+		return true;
+	}
 
+	private ResultWriter instantiateResultWriter(String[] args) throws IOException {
 		String outputDir = "";
 		if (args.length >= 5)
 			outputDir = args[4];
 
+		return new ResultWriter(outputDir + "class.csv", outputDir + "method.csv",
+		outputDir + "variable.csv", outputDir + "field.csv", getVariablesAndFields(args));
+	}
+
+	private String getPath(String[] args) {
+		return args[0];
+	}
+
+	private void setIgnoredDirectories(String[] args) {
 		for (int i = 5; i < args.length; i++) {
 			FileUtils.IGNORED_DIRECTORIES.add(args[i]);
 		}
+	}
 
-		ResultWriter writer = new ResultWriter(outputDir + "class.csv", outputDir + "method.csv",
-				outputDir + "variable.csv", outputDir + "field.csv", variablesAndFields);
+	private void calculateAndWriteResults(String[] args) throws IOException {
+		ResultWriter writer = instantiateResultWriter(args);
 
 		Map<String, CKClassResult> results = new HashMap<>();
 
-		new CK(useJars, maxAtOnce, variablesAndFields).calculate(path, new CKNotifier() {
+		new CK(shouldUseJars(args), getMaxAtOnce(args), getVariablesAndFields(args)).calculate(getPath(args), new CKNotifier() {
 			@Override
 			public void notify(CKClassResult result) {
 				results.put(result.getClassName(), result);
@@ -65,6 +79,14 @@ public class Runner {
 		}
 
 		writer.flushAndClose();
+	}
+
+	public static void main(String[] args) throws IOException {
+		Runner runner = new Runner();
+		runner.validateArgs(args);
+		runner.setIgnoredDirectories(args);
+		runner.calculateAndWriteResults(args);
+		
 		logger.info("Metrics extracted!!!");
 	}
 }
