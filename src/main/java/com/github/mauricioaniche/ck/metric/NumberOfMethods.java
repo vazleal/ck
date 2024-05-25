@@ -57,14 +57,7 @@ public class NumberOfMethods implements CKASTVisitor, ClassLevelMetric {
 	@Override
 	public void setResult(CKClassResult result) {
 		result.setNumberOfMethods(methods);
-		result.setNumberOfStaticMethods(staticMethods);
-		result.setNumberOfPublicMethods(publicMethods);
-		result.setNumberOfPrivateMethods(privateMethods);
-		result.setNumberOfProtectedMethods(protectedMethods);
-		result.setNumberOfDefaultMethods(defaultMethods);
-		result.setNumberOfAbstractMethods(abstractMethods);
-		result.setNumberOfFinalMethods(finalMethods);
-		result.setNumberOfSynchronizedMethods(synchronizedMethods);
-
+		result.setNumberOfAccessRestrictionMethods(publicMethods, privateMethods, protectedMethods);
+		result.setNumberOfTypeMethods(staticMethods, defaultMethods, abstractMethods, finalMethods, synchronizedMethods);
 	}
 }

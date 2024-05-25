@@ -57,14 +57,8 @@ public class NumberOfFields implements CKASTVisitor, ClassLevelMetric {
 
 	@Override
 	public void setResult(CKClassResult result) {
-		result.setNumberOfFields(fields);
-		result.setFieldNames(fieldNames);
-		result.setNumberOfStaticFields(staticFields);
-		result.setNumberOfPublicFields(publicFields);
-		result.setNumberOfPrivateFields(privateFields);
-		result.setNumberOfProtectedFields(protectedFields);
-		result.setNumberOfDefaultFields(defaultFields);
-		result.setNumberOfFinalFields(finalFields);
-		result.setNumberOfSynchronizedFields(synchronizedFields);
+		result.setNumberOfAccessRestrictionFields(publicFields, privateFields, protectedFields);
+		result.setNumberOfTypeFields(staticFields, defaultFields, finalFields, synchronizedFields);
+		result.setFieldMetrics(fields, fieldNames);
 	}
 }

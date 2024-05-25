@@ -374,6 +374,20 @@ public class CKClassResult {
 		return numberOfMethods;
 	}
 
+	public void setNumberOfAccessRestrictionMethods(int publicMethods, int privateMethods, int protectedMethods) {
+        this.numberOfPublicMethods = publicMethods;
+        this.numberOfPrivateMethods = privateMethods;
+        this.numberOfProtectedMethods = protectedMethods;
+    }
+
+    public void setNumberOfTypeMethods(int staticMethods, int defaultMethods, int abstractMethods, int finalMethods, int synchronizedMethods) {
+        this.numberOfStaticMethods = staticMethods;
+        this.numberOfDefaultMethods = defaultMethods;
+        this.numberOfAbstractMethods = abstractMethods;
+        this.numberOfFinalMethods = finalMethods;
+        this.numberOfSynchronizedMethods = synchronizedMethods;
+    }
+
 	public void setNumberOfStaticMethods(int numberOfStaticMethods) {
 		this.numberOfStaticMethods = numberOfStaticMethods;
 	}
@@ -439,6 +453,24 @@ public class CKClassResult {
 	public int getNumberOfSynchronizedMethods() {
 		return numberOfSynchronizedMethods;
 	}
+
+	public void setNumberOfAccessRestrictionFields(int publicFields, int privateFields, int protectedFields) {
+        this.numberOfPublicFields = publicFields;
+        this.numberOfPrivateFields = privateFields;
+        this.numberOfProtectedFields = protectedFields;
+    }
+
+    public void setNumberOfTypeFields(int staticFields, int defaultFields, int finalFields, int synchronizedFields) {
+        this.numberOfStaticFields = staticFields;
+        this.numberOfDefaultFields = defaultFields;
+        this.numberOfFinalFields = finalFields;
+        this.numberOfSynchronizedFields = synchronizedFields;
+    }
+
+	public void setFieldMetrics(int fields, Set<String> fieldNames) {
+        this.numberOfFields = fields;
+        this.fieldNames = fieldNames;
+    }
 
 	public void setNumberOfFields(int numberOfFields) {
 		this.numberOfFields = numberOfFields;
