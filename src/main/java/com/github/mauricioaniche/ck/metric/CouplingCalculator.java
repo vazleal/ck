@@ -1,23 +1,23 @@
 package com.github.mauricioaniche.ck.metric;
 
 import org.eclipse.jdt.core.dom.*;
-
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class CouplingManager {
+public class CouplingCalculator {
+    private static final Logger logger = Logger.getLogger(CouplingCalculator.class.getName());
     private Set<String> coupling = new HashSet<>();
 
     public void coupleTo(Type type) {
-        if (type == null)
-            return;
+        if (type == null) return;
 
         ITypeBinding resolvedBinding = type.resolveBinding();
-        if (resolvedBinding != null)
+        if (resolvedBinding != null) {
             coupleTo(resolvedBinding);
-        else {
+        } else {
             if (type instanceof SimpleType) {
                 SimpleType castedType = (SimpleType) type;
                 addToSet(castedType.getName().getFullyQualifiedName());
@@ -50,36 +50,33 @@ public class CouplingManager {
         }
     }
 
+    public void coupleTo(SimpleName name) {
+        addToSet(name.getFullyQualifiedName());
+    }
+
     public void coupleTo(ITypeBinding binding) {
-        if (binding == null)
-            return;
-        if (binding.isWildcardType())
-            return;
-        if (binding.isNullType())
-            return;
+        if (binding == null || binding.isWildcardType() || binding.isNullType()) return;
 
         String type = binding.getQualifiedName();
-        if (type.equals("null"))
-            return;
+        if (type.equals("null")) return;
 
-        if (isFromJava(type) || binding.isPrimitive())
-            return;
+        if (isFromJava(type) || binding.isPrimitive()) return;
 
         String cleanedType = cleanClassName(type);
         addToSet(cleanedType);
     }
 
-    public void coupleTo(Annotation annotation) {
-        ITypeBinding resolvedType = annotation.resolveTypeBinding();
-        if (resolvedType != null) {
-            coupleTo(resolvedType);
-        } else {
-            addToSet(annotation.getTypeName().getFullyQualifiedName());
-        }
+    private String cleanClassName(String type) {
+        String cleanedType = type.replace("[]", "").replace("\\$", ".");
+
+        if (cleanedType.contains("<"))
+            cleanedType = cleanedType.substring(0, cleanedType.indexOf("<"));
+
+        return cleanedType;
     }
 
-    public void coupleTo(SimpleName name) {
-        addToSet(name.getFullyQualifiedName());
+    private boolean isFromJava(String type) {
+        return type.startsWith("java.") || type.startsWith("javax.");
     }
 
     public void addToSet(String name) {
@@ -100,20 +97,5 @@ public class CouplingManager {
 
     public int getCouplingSize() {
         return coupling.size();
-    }
-
-    private String cleanClassName(String type) {
-        // remove possible array(s) in the class name
-        String cleanedType = type.replace("[]", "").replace("\\$", ".");
-
-        // remove generics declaration, let's stick with the type
-        if (cleanedType.contains("<"))
-            cleanedType = cleanedType.substring(0, cleanedType.indexOf("<"));
-
-        return cleanedType;
-    }
-
-    private boolean isFromJava(String type) {
-        return type.startsWith("java.") || type.startsWith("javax.");
     }
 }
