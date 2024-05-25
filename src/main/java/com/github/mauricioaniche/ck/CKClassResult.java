@@ -5,6 +5,8 @@ import java.util.*;
 import com.github.mauricioaniche.ck.metric.CouplingExtras;
 import com.github.mauricioaniche.ck.metric.NOCExtras;
 
+import static com.github.mauricioaniche.ck.util.LOCCalculator.calculate;
+
 public class CKClassResult {
 
 	private String file;
@@ -76,6 +78,10 @@ public class CKClassResult {
 		this.visibleMethods= new HashSet<>();
 		this.modifiers = modifiers;
 	}
+
+	public void calculateAndSetLoc(String nodeRepresentation) {
+        this.loc = calculate(nodeRepresentation);
+    }
 
 	/**
 	 * public/static/private and other org.eclipse.jdt.core.dom.Modifier modifiers
