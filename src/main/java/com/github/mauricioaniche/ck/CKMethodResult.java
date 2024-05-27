@@ -5,6 +5,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 import com.github.mauricioaniche.ck.metric.CouplingExtras;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CKMethodResult {
 	private int cbo;
@@ -398,4 +399,11 @@ public class CKMethodResult {
 	public void setNullCheckQty(int nullCheckQty) {
 		this.nullCheckQty = nullCheckQty;
 	}
+
+	//Extract all local(inner-class) method invocations and save them in a HashMap
+    public Set<String> getLocalInvocations(Set<String> allMethodNames) {
+        return methodInvocations.stream()
+                .filter(allMethodNames::contains)
+                .collect(Collectors.toSet());
+    }
 }

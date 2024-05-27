@@ -4,6 +4,8 @@ import java.util.*;
 
 import com.github.mauricioaniche.ck.metrictypes.*;
 
+import static com.github.mauricioaniche.ck.util.LOCCalculator.calculate;
+
 public class CKClassResult {
 
 	private ClassMetrics classMetrics;
@@ -27,6 +29,10 @@ public class CKClassResult {
 		this.generalMetrics = new GeneralMetrics();
 	}
 
+	public void calculateAndSetLoc(String nodeRepresentation) {
+        this.setLoc(calculate(nodeRepresentation));
+    }
+
 	/**
 	 * public/static/private and other org.eclipse.jdt.core.dom.Modifier modifiers
 	 * 
@@ -43,6 +49,38 @@ public class CKClassResult {
 
 	public String getClassName() {
 		return className;
+	}
+
+	public void setNumberOfAccessRestrictionMethods(int publicMethods, int privateMethods, int protectedMethods) {
+        this.setNumberOfPublicMethods(publicMethods);
+        this.setNumberOfPrivateMethods(privateMethods);
+        this.setNumberOfProtectedMethods(protectedMethods);
+    }
+
+    public void setNumberOfTypeMethods(int staticMethods, int defaultMethods, int abstractMethods, int finalMethods, int synchronizedMethods) {
+        this.setNumberOfStaticMethods(staticMethods);
+        this.setNumberOfDefaultMethods(defaultMethods);
+        this.setNumberOfAbstractMethods(abstractMethods);
+        this.setNumberOfFinalMethods(finalMethods);
+        this.setNumberOfSynchronizedMethods(synchronizedMethods);
+    }
+
+	public void setNumberOfAccessRestrictionFields(int publicFields, int privateFields, int protectedFields) {
+		this.setNumberOfPublicFields(publicFields);
+		this.setNumberOfPrivateFields(privateFields);
+		this.setNumberOfProtectedFields(protectedFields);
+	}
+	
+	public void setNumberOfTypeFields(int staticFields, int defaultFields, int finalFields, int synchronizedFields) {
+		this.setNumberOfStaticFields(staticFields);
+		this.setNumberOfDefaultFields(defaultFields);
+		this.setNumberOfFinalFields(finalFields);
+		this.setNumberOfSynchronizedFields(synchronizedFields);
+	}
+	
+	public void setFieldMetrics(int fields, Set<String> fieldNames) {
+		this.setNumberOfFields(fields);
+		this.setFieldNames(fieldNames);
 	}
 
 	public String getType() {

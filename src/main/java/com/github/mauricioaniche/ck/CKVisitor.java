@@ -36,6 +36,13 @@ public class CKVisitor extends ASTVisitor {
 		ClassInTheStack() {
 			methods = new ArrayDeque<>();
 		}
+
+		ClassInTheStack(CKClassResult classAux, List<ClassLevelMetric> classMetric) {
+			methods = new ArrayDeque<>();
+			this.result = classAux;
+			this.classLevelMetrics = classMetric;
+		}
+
 	}
 
 	private Deque<ClassInTheStack> classes;
@@ -65,36 +72,46 @@ public class CKVisitor extends ASTVisitor {
 		String className = binding != null ? binding.getBinaryName() : node.getName().getFullyQualifiedName();
 		String type = getTypeOfTheUnit(node);
 		int modifiers = node.getModifiers();
-		CKClassResult currentClass = new CKClassResult(sourceFilePath, className, type, modifiers);
-		currentClass.setLoc(calculate(node.toString()));
+		CKClassResult currentClass = createCKClassResult(sourceFilePath, className, type, modifiers, node);
 
 		// there might be metrics that use it
 		// (even before a class is declared)
-		if (!classes.isEmpty()) {
-			classes.peek().classLevelMetrics.stream().map(CKASTVisitor.class::cast).forEach(ast -> ast.visit(node));
-			if (!classes.peek().methods.isEmpty())
-				classes.peek().methods.peek().methodLevelMetrics.stream().map(CKASTVisitor.class::cast)
-						.forEach(ast -> ast.visit(node));
-
-		}
+		handleClassLevelMetrics(node);
 
 		// create a set of visitors, just for the current class
 		List<ClassLevelMetric> classLevelMetricsVisitors = instantiateClassLevelMetricVisitors(className);
 
 		// store everything in a 'class in the stack' data structure
-		ClassInTheStack classInTheStack = new ClassInTheStack();
-		classInTheStack.result = currentClass;
-		classInTheStack.classLevelMetrics = classLevelMetricsVisitors;
+		ClassInTheStack classInTheStack = new ClassInTheStack(currentClass, classLevelMetricsVisitors);
 
 		// push it to the stack, so we know the current class we are visiting
 		classes.push(classInTheStack);
 
 		// there might be class level metrics that use the TypeDeclaration
 		// so, let's run them
-		classes.peek().classLevelMetrics.stream().map(CKASTVisitor.class::cast).forEach(ast -> ast.visit(node));
+		runClassLevelMetrics(node);
 
 		return true;
 	}
+
+	private CKClassResult createCKClassResult(String sourceFilePath, String className, String type, int modifiers, TypeDeclaration node) {
+		CKClassResult currentClass = new CKClassResult(sourceFilePath, className, type, modifiers);
+		currentClass.calculateAndSetLoc(node.toString());
+		return currentClass;
+	}
+
+	private void handleClassLevelMetrics(TypeDeclaration node) {
+		if (!classes.isEmpty()) {
+			classes.peek().classLevelMetrics.stream().map(CKASTVisitor.class::cast).forEach(ast -> ast.visit(node));
+			if (!classes.peek().methods.isEmpty())
+				classes.peek().methods.peek().methodLevelMetrics.stream().map(CKASTVisitor.class::cast)
+						.forEach(ast -> ast.visit(node));
+		}
+	}
+
+	private void runClassLevelMetrics(TypeDeclaration node) {
+		classes.peek().classLevelMetrics.stream().map(CKASTVisitor.class::cast).forEach(ast -> ast.visit(node));
+	}	
 
 	@Override
 	public void endVisit(TypeDeclaration node) {
