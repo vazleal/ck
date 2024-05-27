@@ -2,85 +2,35 @@ package com.github.mauricioaniche.ck;
 
 import java.util.*;
 
-import com.github.mauricioaniche.ck.metric.CouplingExtras;
-import com.github.mauricioaniche.ck.metric.NOCExtras;
+import com.github.mauricioaniche.ck.metrictypes.*;
 
 import static com.github.mauricioaniche.ck.util.LOCCalculator.calculate;
 
 public class CKClassResult {
 
+	private ClassMetrics classMetrics;
+	private FieldMetrics fieldMetrics;
+	private MethodMetrics methodMetrics;
+	private GeneralMetrics generalMetrics;
+
 	private String file;
 	private String className;
 	private String type;
-
-	private int dit;
-	private int noc = -1;
-	private int wmc;
-	private int cbo;
-	private int cboModified = -1;
-	private int fanin = -1;
-	private int fanout = -1;
-	private int lcom;
-	private float lcomNormalized;
-	private int rfc;
-
-	private int nosi;
-	private int loc;
-	
-	private Set<CKMethodResult> methods;
-	private Set<CKMethodResult> visibleMethods;
-	private Set<String> fieldNames;
-	private int returnQty;
-	private int loopQty;
-	private int comparisonsQty;
-	private int tryQty;
-	private int catchQty;
-	private int parenthesizedExpsQty;
-	private int stringLiteralsQty;
-	private int numbersQty;
-	private int assignmentsQty;
-	private int mathOperationsQty;
-	private int variablesQty;
-	private int maxNestedBlocks;
-	private int anonymousClassesQty;
-	private int innerClassesQty;
-	private int lambdasQty;
-	private int uniqueWordsQty;
-	private int nullCheckQty;
-	private int numberOfMethods;
-	private int numberOfStaticMethods;
-	private int numberOfPublicMethods;
-	private int numberOfPrivateMethods;
-	private int numberOfProtectedMethods;
-	private int numberOfDefaultMethods;
-	private int numberOfAbstractMethods;
-	private int numberOfFinalMethods;
-	private int numberOfSynchronizedMethods;
-	private int numberOfFields;
-	private int numberOfStaticFields;
-	private int numberOfPublicFields;
-	private int numberOfPrivateFields;
-	private int numberOfProtectedFields;
-	private int numberOfDefaultFields;
-	private int numberOfFinalFields;
-	private int numberOfSynchronizedFields;
 	private int modifiers;
-	private int numberOfLogStatements;
-
-	private float tightClassCohesion;
-	private float looseClassCohesion;
 
 	public CKClassResult(String file, String className, String type, int modifiers) {
 		this.file = file;
 		this.className = className;
 		this.type = type;
-		this.methods = new HashSet<>();
-		this.visibleMethods= new HashSet<>();
 		this.modifiers = modifiers;
+		this.classMetrics = new ClassMetrics(className);
+		this.fieldMetrics = new FieldMetrics();
+		this.methodMetrics = new MethodMetrics();
+		this.generalMetrics = new GeneralMetrics();
 	}
 
 	public void calculateAndSetLoc(String nodeRepresentation) {
-        this.loc = calculate(nodeRepresentation);
+        this.setLoc(calculate(nodeRepresentation));
     }
 
 	/**
@@ -92,482 +42,486 @@ public class CKClassResult {
 	public int getModifiers() {
 		return modifiers;
 	}
-	
+
 	public String getFile() {
 		return file;
 	}
 
-	public int getDit() {
-		return dit;
-	}
-
-	public void setDit(int dit) {
-		this.dit = dit;
-	}
-
-	public int getNoc(){
-		if (this.noc == -1){
-			NOCExtras extras = NOCExtras.getInstance();
-			this.setNoc(extras.getNocValueByName(this.className));
-		}
-			
-		return this.noc;
-	}
-	
-	public void setNoc(int noc){
-		this.noc = noc;
-	}
-	
 	public String getClassName() {
 		return className;
 	}
 
-	public void setWmc(int cc) {
-		this.wmc = cc;
-	}
-	
-	public int getWmc() {
-		return wmc;
-	}
-
-	public int getCbo() {
-		return cbo;
-	}
-
-	public void setCbo(int cbo) {
-		this.cbo = cbo;
-	}
-	
-	public int getCboModified() {
-		if(this.cboModified == -1){
-			CouplingExtras extras = CouplingExtras.getInstance();
-			this.setCboModified(extras.getValueCBOClass(this.className));
-		}
-		return cboModified;
-	}
-
-	public void setCboModified(int cboModified) {
-		this.cboModified = cboModified;
-	}
-
-	public int getFanin() {
-		
-		if(this.fanin == -1){
-			CouplingExtras extras = CouplingExtras.getInstance();
-			this.setFanin(extras.getValueFanInClass(this.className));
-		}
-		
-		return fanin;
-	}
-	
-	public void setFanin(int fanin) {
-		this.fanin = fanin;
-	}
-	
-	public int getFanout() {
-		
-		if(this.fanout == -1){
-			CouplingExtras extras = CouplingExtras.getInstance();
-			this.setFanout(extras.getValueFanOutClass(this.className));
-		}
-		
-		return fanout;
-	}
-	
-	public void setFanout(int fanout) {
-		this.fanout = fanout;
-	}
-
-	public void setLcom(int lcom) {
-		this.lcom = lcom;
-	}
-	public int getLcom() {
-		return lcom;
-	}
-
-	public void setLcomNormalized(float lcomNormalized) {
-		this.lcomNormalized = lcomNormalized;
-	}
-	
-	public float getLcomNormalized() {
-		return lcomNormalized;
-	}
-	
-	public void setRfc(int rfc) {
-		this.rfc = rfc;
-	}
-	
-	public int getRfc() {
-		return rfc;
-	}
-	
-	public int getNosi() {
-		return nosi;
-	}
-
-	public void setNosi(int nosi) {
-		this.nosi = nosi;
-	}
-
-	public int getLoc() {
-		return loc;
-	}
-
-	public void setLoc(int loc) {
-		this.loc = loc;
-	}
-
-
-	@Override
-	public String toString() {
-		return "CKClassResult [file=" + file + ", className=" + className + "]";
-	}
-
-	public void addMethod(CKMethodResult method) {
-		this.methods.add(method);
-		if(method.getIsVisible()){
-			visibleMethods.add(method);
-		}
-	}
-
-	public Set<CKMethodResult> getMethods() {
-		return Collections.unmodifiableSet(methods);
-	}
-
-	public Set<CKMethodResult> getVisibleMethods() {
-		return Collections.unmodifiableSet(visibleMethods);
-	}
-
-	public Optional<CKMethodResult> getMethod(String methodName) {
-		return methods.stream().filter(m -> m.getMethodName().equals(methodName)).findFirst();
-	}
-
-	public void setFieldNames(Set<String> fieldNames){ this.fieldNames = fieldNames;}
-
-	public Set<String> getFieldNames(){ return fieldNames; }
-
-	public void setReturnQty(int returnQty) {
-		this.returnQty = returnQty;
-	}
-
-	public int getReturnQty() {
-		return returnQty;
-	}
-
-	public void setLoopQty(int loopQty) {
-		this.loopQty = loopQty;
-	}
-
-	public int getLoopQty() {
-		return loopQty;
-	}
-
-	public void setComparisonsQty(int comparisonsQty) {
-		this.comparisonsQty = comparisonsQty;
-	}
-
-	public int getComparisonsQty() {
-		return comparisonsQty;
-	}
-
-	public void setTryQty(int tryCatchQty) {
-		this.tryQty = tryCatchQty;
-	}
-
-	public int getTryQty() {
-		return tryQty;
-	}
-
-	public void setParenthesizedExpsQty(int parenthesizedExpsQty) {
-		this.parenthesizedExpsQty = parenthesizedExpsQty;
-	}
-
-	public int getParenthesizedExpsQty() {
-		return parenthesizedExpsQty;
-	}
-
-	public void setStringLiteralsQty(int stringLiteralsQty) {
-		this.stringLiteralsQty = stringLiteralsQty;
-	}
-
-	public int getStringLiteralsQty() {
-		return stringLiteralsQty;
-	}
-
-	public void setNumbersQty(int numbersQty) {
-		this.numbersQty = numbersQty;
-	}
-
-	public int getNumbersQty() {
-		return numbersQty;
-	}
-
-	public void setAssignmentsQty(int assignmentsQty) {
-		this.assignmentsQty = assignmentsQty;
-	}
-
-	public int getAssignmentsQty() {
-		return assignmentsQty;
-	}
-
-	public void setMathOperationsQty(int mathOperationsQty) {
-		this.mathOperationsQty = mathOperationsQty;
-	}
-
-	public int getMathOperationsQty() {
-		return mathOperationsQty;
-	}
-
-	public void setVariablesQty(int variablesQty) {
-		this.variablesQty = variablesQty;
-	}
-
-	public int getVariablesQty() {
-		return variablesQty;
-	}
-
-	public void setMaxNestedBlocks(int maxNestedBlocks) {
-		this.maxNestedBlocks = maxNestedBlocks;
-	}
-
-	public int getMaxNestedBlocks() {
-		return maxNestedBlocks;
-	}
-
-	public void setAnonymousClassesQty(int anonymousClassesQty) {
-		this.anonymousClassesQty = anonymousClassesQty;
-	}
-
-	public int getAnonymousClassesQty() {
-		return anonymousClassesQty;
-	}
-
-	public void setInnerClassesQty(int innerClassesQty) {
-		this.innerClassesQty = innerClassesQty;
-	}
-
-	public int getInnerClassesQty() {
-		return innerClassesQty;
-	}
-
-	public void setLambdasQty(int lambdasQty) {
-		this.lambdasQty = lambdasQty;
-	}
-
-	public int getLambdasQty() {
-		return lambdasQty;
-	}
-
-	public void setUniqueWordsQty(int uniqueWordsQty) {
-		this.uniqueWordsQty = uniqueWordsQty;
-	}
-
-	public int getUniqueWordsQty() {
-		return uniqueWordsQty;
-	}
-
-	public void setNumberOfMethods(int numberOfMethods) {
-		this.numberOfMethods = numberOfMethods;
-	}
-
-	public int getNumberOfMethods() {
-		return numberOfMethods;
-	}
-
 	public void setNumberOfAccessRestrictionMethods(int publicMethods, int privateMethods, int protectedMethods) {
-        this.numberOfPublicMethods = publicMethods;
-        this.numberOfPrivateMethods = privateMethods;
-        this.numberOfProtectedMethods = protectedMethods;
+        this.setNumberOfPublicMethods(publicMethods);
+        this.setNumberOfPrivateMethods(privateMethods);
+        this.setNumberOfProtectedMethods(protectedMethods);
     }
 
     public void setNumberOfTypeMethods(int staticMethods, int defaultMethods, int abstractMethods, int finalMethods, int synchronizedMethods) {
-        this.numberOfStaticMethods = staticMethods;
-        this.numberOfDefaultMethods = defaultMethods;
-        this.numberOfAbstractMethods = abstractMethods;
-        this.numberOfFinalMethods = finalMethods;
-        this.numberOfSynchronizedMethods = synchronizedMethods;
+        this.setNumberOfStaticMethods(staticMethods);
+        this.setNumberOfDefaultMethods(defaultMethods);
+        this.setNumberOfAbstractMethods(abstractMethods);
+        this.setNumberOfFinalMethods(finalMethods);
+        this.setNumberOfSynchronizedMethods(synchronizedMethods);
     }
-
-	public void setNumberOfStaticMethods(int numberOfStaticMethods) {
-		this.numberOfStaticMethods = numberOfStaticMethods;
-	}
-
-	public int getNumberOfStaticMethods() {
-		return numberOfStaticMethods;
-	}
-
-	public void setNumberOfPublicMethods(int numberOfPublicMethods) {
-		this.numberOfPublicMethods = numberOfPublicMethods;
-	}
-
-	public int getNumberOfPublicMethods() {
-		return numberOfPublicMethods;
-	}
-
-	public void setNumberOfPrivateMethods(int numberOfPrivateMethods) {
-		this.numberOfPrivateMethods = numberOfPrivateMethods;
-	}
-
-	public int getNumberOfPrivateMethods() {
-		return numberOfPrivateMethods;
-	}
-
-	public void setNumberOfProtectedMethods(int numberOfProtectedMethods) {
-		this.numberOfProtectedMethods = numberOfProtectedMethods;
-	}
-
-	public int getNumberOfProtectedMethods() {
-		return numberOfProtectedMethods;
-	}
-
-	public void setNumberOfDefaultMethods(int numberOfDefaultMethods) {
-		this.numberOfDefaultMethods = numberOfDefaultMethods;
-	}
-
-	public int getNumberOfDefaultMethods() {
-		return numberOfDefaultMethods;
-	}
-
-	public void setNumberOfAbstractMethods(int numberOfAbstractMethods) {
-		this.numberOfAbstractMethods = numberOfAbstractMethods;
-	}
-
-	public int getNumberOfAbstractMethods() {
-		return numberOfAbstractMethods;
-	}
-
-	public void setNumberOfFinalMethods(int numberOfFinalMethods) {
-		this.numberOfFinalMethods = numberOfFinalMethods;
-	}
-
-	public int getNumberOfFinalMethods() {
-		return numberOfFinalMethods;
-	}
-
-	public void setNumberOfSynchronizedMethods(int numberOfSynchronizedMethods) {
-		this.numberOfSynchronizedMethods = numberOfSynchronizedMethods;
-	}
-
-	public int getNumberOfVisibleMethods() { return visibleMethods.size();	}
-
-	public int getNumberOfSynchronizedMethods() {
-		return numberOfSynchronizedMethods;
-	}
 
 	public void setNumberOfAccessRestrictionFields(int publicFields, int privateFields, int protectedFields) {
-        this.numberOfPublicFields = publicFields;
-        this.numberOfPrivateFields = privateFields;
-        this.numberOfProtectedFields = protectedFields;
-    }
-
-    public void setNumberOfTypeFields(int staticFields, int defaultFields, int finalFields, int synchronizedFields) {
-        this.numberOfStaticFields = staticFields;
-        this.numberOfDefaultFields = defaultFields;
-        this.numberOfFinalFields = finalFields;
-        this.numberOfSynchronizedFields = synchronizedFields;
-    }
-
+		this.setNumberOfPublicFields(publicFields);
+		this.setNumberOfPrivateFields(privateFields);
+		this.setNumberOfProtectedFields(protectedFields);
+	}
+	
+	public void setNumberOfTypeFields(int staticFields, int defaultFields, int finalFields, int synchronizedFields) {
+		this.setNumberOfStaticFields(staticFields);
+		this.setNumberOfDefaultFields(defaultFields);
+		this.setNumberOfFinalFields(finalFields);
+		this.setNumberOfSynchronizedFields(synchronizedFields);
+	}
+	
 	public void setFieldMetrics(int fields, Set<String> fieldNames) {
-        this.numberOfFields = fields;
-        this.fieldNames = fieldNames;
-    }
-
-	public void setNumberOfFields(int numberOfFields) {
-		this.numberOfFields = numberOfFields;
-	}
-
-	public int getNumberOfFields() {
-		return numberOfFields;
-	}
-
-	public void setNumberOfStaticFields(int numberOfStaticFields) {
-		this.numberOfStaticFields = numberOfStaticFields;
-	}
-
-	public int getNumberOfStaticFields() {
-		return numberOfStaticFields;
-	}
-
-	public void setNumberOfPublicFields(int numberOfPublicFields) {
-		this.numberOfPublicFields = numberOfPublicFields;
-	}
-
-	public int getNumberOfPublicFields() {
-		return numberOfPublicFields;
-	}
-
-	public void setNumberOfPrivateFields(int numberOfPrivateFields) {
-		this.numberOfPrivateFields = numberOfPrivateFields;
-	}
-
-	public int getNumberOfPrivateFields() {
-		return numberOfPrivateFields;
-	}
-
-	public void setNumberOfProtectedFields(int numberOfProtectedFields) {
-		this.numberOfProtectedFields = numberOfProtectedFields;
-	}
-
-	public int getNumberOfProtectedFields() {
-		return numberOfProtectedFields;
-	}
-
-	public void setNumberOfDefaultFields(int numberOfDefaultFields) {
-		this.numberOfDefaultFields = numberOfDefaultFields;
-	}
-
-	public int getNumberOfDefaultFields() {
-		return numberOfDefaultFields;
-	}
-
-	public void setNumberOfFinalFields(int numberOfFinalFields) {
-		this.numberOfFinalFields = numberOfFinalFields;
-	}
-
-	public int getNumberOfFinalFields() {
-		return numberOfFinalFields;
-	}
-
-	public void setNumberOfSynchronizedFields(int numberOfSynchronizedFields) {
-		this.numberOfSynchronizedFields = numberOfSynchronizedFields;
-	}
-
-	public int getNumberOfSynchronizedFields() {
-		return numberOfSynchronizedFields;
+		this.setNumberOfFields(fields);
+		this.setFieldNames(fieldNames);
 	}
 
 	public String getType() {
 		return type;
 	}
 
+	// Métodos genéricos de get e set de ClassMetrics
+
+	public int getDit() {
+		return this.classMetrics.getDit();
+	}
+
+	public void setDit(int dit) {
+		this.classMetrics.setDit(dit);
+	}
+
+	public int getNoc() {
+		return this.classMetrics.getNoc();
+	}
+
+	public void setNoc(int noc) {
+		this.classMetrics.setNoc(noc);
+	}
+
+	public void setWmc(int cc) {
+		this.classMetrics.setWmc(cc);
+	}
+
+	public int getWmc() {
+		return this.classMetrics.getWmc();
+	}
+
+	public int getCbo() {
+		return this.classMetrics.getCbo();
+	}
+
+	public void setCbo(int cbo) {
+		this.classMetrics.setCbo(cbo);
+	}
+
+	public int getCboModified() {
+		return this.classMetrics.getCboModified();
+	}
+
+	public void setCboModified(int cboModified) {
+		this.classMetrics.setCboModified(cboModified);
+	}
+
+	public int getFanin() {
+		return this.classMetrics.getFanin();
+	}
+
+	public void setFanin(int fanin) {
+		this.classMetrics.setFanin(fanin);
+	}
+
+	public int getFanout() {
+		return this.classMetrics.getFanout();
+	}
+
+	public void setFanout(int fanout) {
+		this.classMetrics.setFanout(fanout);
+	}
+
+	public void setLcom(int lcom) {
+		this.classMetrics.setLcom(lcom);
+	}
+
+	public int getLcom() {
+		return this.classMetrics.getLcom();
+	}
+
+	public void setLcomNormalized(float lcomNormalized) {
+		this.classMetrics.setLcomNormalized(lcomNormalized);
+	}
+
+	public float getLcomNormalized() {
+		return this.classMetrics.getLcomNormalized();
+	}
+
+	public void setRfc(int rfc) {
+		this.classMetrics.setRfc(rfc);
+	}
+
+	public int getRfc() {
+		return this.classMetrics.getRfc();
+	}
+
+	public int getNosi() {
+		return this.generalMetrics.getNosi();
+	}
+
+	public void setNosi(int nosi) {
+		this.generalMetrics.setNosi(nosi);
+	}
+
+	public int getLoc() {
+		return this.generalMetrics.getLoc();
+	}
+
+	public void setLoc(int loc) {
+		this.generalMetrics.setLoc(loc);
+	}
+
+	public void addMethod(CKMethodResult method) {
+		this.methodMetrics.addMethod(method);
+	}
+
+	public Set<CKMethodResult> getMethods() {
+		return this.methodMetrics.getMethods();
+	}
+
+	public Set<CKMethodResult> getVisibleMethods() {
+		return this.methodMetrics.getVisibleMethods();
+	}
+
+	public Optional<CKMethodResult> getMethod(String methodName) {
+		return this.methodMetrics.getMethod(methodName);
+	}
+
+	public void setFieldNames(Set<String> fieldNames) {
+		this.fieldMetrics.setFieldNames(fieldNames);
+	}
+
+	public Set<String> getFieldNames() {
+		return this.fieldMetrics.getFieldNames();
+	}
+
+	// Métodos genéricos de set e get de GeneralMetrics
+
+	public void setReturnQty(int returnQty) {
+		this.generalMetrics.setReturnQty(returnQty);
+	}
+
+	public int getReturnQty() {
+		return this.generalMetrics.getReturnQty();
+	}
+
+	public void setLoopQty(int loopQty) {
+		this.generalMetrics.setLoopQty(loopQty);
+	}
+
+	public int getLoopQty() {
+		return this.generalMetrics.getLoopQty();
+	}
+
+	public void setComparisonsQty(int comparisonsQty) {
+		this.generalMetrics.setComparisonsQty(comparisonsQty);
+	}
+
+	public int getComparisonsQty() {
+		return this.generalMetrics.getComparisonsQty();
+	}
+
+	public void setTryQty(int tryCatchQty) {
+		this.generalMetrics.setTryQty(tryCatchQty);
+	}
+
+	public int getTryQty() {
+		return this.generalMetrics.getTryQty();
+	}
+
+	public void setParenthesizedExpsQty(int parenthesizedExpsQty) {
+		this.generalMetrics.setParenthesizedExpsQty(parenthesizedExpsQty);
+	}
+
+	public int getParenthesizedExpsQty() {
+		return this.generalMetrics.getParenthesizedExpsQty();
+	}
+
+	public void setStringLiteralsQty(int stringLiteralsQty) {
+		this.generalMetrics.setStringLiteralsQty(stringLiteralsQty);
+	}
+
+	public int getStringLiteralsQty() {
+		return this.generalMetrics.getStringLiteralsQty();
+	}
+
+	public void setNumbersQty(int numbersQty) {
+		this.generalMetrics.setNumbersQty(numbersQty);
+	}
+
+	public int getNumbersQty() {
+		return this.generalMetrics.getNumbersQty();
+	}
+
+	public void setAssignmentsQty(int assignmentsQty) {
+		this.generalMetrics.setAssignmentsQty(assignmentsQty);
+	}
+
+	public int getAssignmentsQty() {
+		return this.generalMetrics.getAssignmentsQty();
+	}
+
+	public void setMathOperationsQty(int mathOperationsQty) {
+		this.generalMetrics.setMathOperationsQty(mathOperationsQty);
+	}
+
+	public int getMathOperationsQty() {
+		return this.generalMetrics.getMathOperationsQty();
+	}
+
+	public void setVariablesQty(int variablesQty) {
+		this.generalMetrics.setVariablesQty(variablesQty);
+	}
+
+	public int getVariablesQty() {
+		return this.generalMetrics.getVariablesQty();
+	}
+
+	public void setMaxNestedBlocks(int maxNestedBlocks) {
+		this.generalMetrics.setMaxNestedBlocks(maxNestedBlocks);
+	}
+
+	public int getMaxNestedBlocks() {
+		return this.generalMetrics.getMaxNestedBlocks();
+	}
+
+	public void setAnonymousClassesQty(int anonymousClassesQty) {
+		this.generalMetrics.setAnonymousClassesQty(anonymousClassesQty);
+	}
+
+	public int getAnonymousClassesQty() {
+		return this.generalMetrics.getAnonymousClassesQty();
+	}
+
+	public void setInnerClassesQty(int innerClassesQty) {
+		this.generalMetrics.setInnerClassesQty(innerClassesQty);
+	}
+
+	public int getInnerClassesQty() {
+		return this.generalMetrics.getInnerClassesQty();
+	}
+
+	public void setLambdasQty(int lambdasQty) {
+		this.generalMetrics.setLambdasQty(lambdasQty);
+	}
+
+	public int getLambdasQty() {
+		return this.generalMetrics.getLambdasQty();
+	}
+
+	public void setUniqueWordsQty(int uniqueWordsQty) {
+		this.generalMetrics.setUniqueWordsQty(uniqueWordsQty);
+	}
+
+	public int getUniqueWordsQty() {
+		return this.generalMetrics.getUniqueWordsQty();
+	}
+
+	// Métodos genéricos de set e get de MethodMetrics
+
+	public void setNumberOfMethods(int numberOfMethods) {
+		this.methodMetrics.setNumberOfMethods(numberOfMethods);
+	}
+
+	public int getNumberOfMethods() {
+		return this.methodMetrics.getNumberOfMethods();
+	}
+
+	public void setNumberOfStaticMethods(int numberOfStaticMethods) {
+		this.methodMetrics.setNumberOfStaticMethods(numberOfStaticMethods);
+	}
+
+	public int getNumberOfStaticMethods() {
+		return this.methodMetrics.getNumberOfStaticMethods();
+	}
+
+	public void setNumberOfPublicMethods(int numberOfPublicMethods) {
+		this.methodMetrics.setNumberOfPublicMethods(numberOfPublicMethods);
+	}
+
+	public int getNumberOfPublicMethods() {
+		return this.methodMetrics.getNumberOfPublicMethods();
+	}
+
+	public void setNumberOfPrivateMethods(int numberOfPrivateMethods) {
+		this.methodMetrics.setNumberOfPrivateMethods(numberOfPrivateMethods);
+	}
+
+	public int getNumberOfPrivateMethods() {
+		return this.methodMetrics.getNumberOfPrivateMethods();
+	}
+
+	public void setNumberOfProtectedMethods(int numberOfProtectedMethods) {
+		this.methodMetrics.setNumberOfProtectedMethods(numberOfProtectedMethods);
+	}
+
+	public int getNumberOfProtectedMethods() {
+		return this.methodMetrics.getNumberOfProtectedMethods();
+	}
+
+	public void setNumberOfDefaultMethods(int numberOfDefaultMethods) {
+		this.methodMetrics.setNumberOfDefaultMethods(numberOfDefaultMethods);
+	}
+
+	public int getNumberOfDefaultMethods() {
+		return this.methodMetrics.getNumberOfDefaultMethods();
+	}
+
+	public void setNumberOfAbstractMethods(int numberOfAbstractMethods) {
+		this.methodMetrics.setNumberOfAbstractMethods(numberOfAbstractMethods);
+	}
+
+	public int getNumberOfAbstractMethods() {
+		return this.methodMetrics.getNumberOfAbstractMethods();
+	}
+
+	public void setNumberOfFinalMethods(int numberOfFinalMethods) {
+		this.methodMetrics.setNumberOfFinalMethods(numberOfFinalMethods);
+	}
+
+	public int getNumberOfFinalMethods() {
+		return this.methodMetrics.getNumberOfFinalMethods();
+	}
+
+	public void setNumberOfSynchronizedMethods(int numberOfSynchronizedMethods) {
+		this.methodMetrics.setNumberOfSynchronizedMethods(numberOfSynchronizedMethods);
+	}
+
+	public int getNumberOfVisibleMethods() {
+		return this.methodMetrics.getNumberOfVisibleMethods();
+	}
+
+	public int getNumberOfSynchronizedMethods() {
+		return this.methodMetrics.getNumberOfSynchronizedMethods();
+	}
+
+	// Métodos de set e get de FieldMetrics
+
+	public void setNumberOfFields(int numberOfFields) {
+		this.fieldMetrics.setNumberOfFields(numberOfFields);
+	}
+
+	public int getNumberOfFields() {
+		return this.fieldMetrics.getNumberOfFields();
+	}
+
+	public void setNumberOfStaticFields(int numberOfStaticFields) {
+		this.fieldMetrics.setNumberOfStaticFields(numberOfStaticFields);
+	}
+
+	public int getNumberOfStaticFields() {
+		return this.fieldMetrics.getNumberOfStaticFields();
+	}
+
+	public void setNumberOfPublicFields(int numberOfPublicFields) {
+		this.fieldMetrics.setNumberOfPublicFields(numberOfPublicFields);
+	}
+
+	public int getNumberOfPublicFields() {
+		return this.fieldMetrics.getNumberOfPublicFields();
+	}
+
+	public void setNumberOfPrivateFields(int numberOfPrivateFields) {
+		this.fieldMetrics.setNumberOfPrivateFields(numberOfPrivateFields);
+	}
+
+	public int getNumberOfPrivateFields() {
+		return this.fieldMetrics.getNumberOfPrivateFields();
+	}
+
+	public void setNumberOfProtectedFields(int numberOfProtectedFields) {
+		this.fieldMetrics.setNumberOfProtectedFields(numberOfProtectedFields);
+	}
+
+	public int getNumberOfProtectedFields() {
+		return this.fieldMetrics.getNumberOfProtectedFields();
+	}
+
+	public void setNumberOfDefaultFields(int numberOfDefaultFields) {
+		this.fieldMetrics.setNumberOfDefaultFields(numberOfDefaultFields);
+	}
+
+	public int getNumberOfDefaultFields() {
+		return this.fieldMetrics.getNumberOfDefaultFields();
+	}
+
+	public void setNumberOfFinalFields(int numberOfFinalFields) {
+		this.fieldMetrics.setNumberOfFinalFields(numberOfFinalFields);
+	}
+
+	public int getNumberOfFinalFields() {
+		return this.fieldMetrics.getNumberOfFinalFields();
+	}
+
+	public void setNumberOfSynchronizedFields(int numberOfSynchronizedFields) {
+		this.fieldMetrics.setNumberOfSynchronizedFields(numberOfSynchronizedFields);
+	}
+
+	public int getNumberOfSynchronizedFields() {
+		return this.fieldMetrics.getNumberOfSynchronizedFields();
+	}
+
 	public void setLogStatementsQty(int numberOfLogStatements) {
-		this.numberOfLogStatements = numberOfLogStatements;
+		this.generalMetrics.setLogStatementsQty(numberOfLogStatements);
+
 	}
 
 	public int getNumberOfLogStatements() {
-		return numberOfLogStatements;
+		return this.generalMetrics.getNumberOfLogStatements();
 	}
 
 	public float getTightClassCohesion() {
-		return tightClassCohesion;
+		return this.classMetrics.getTightClassCohesion();
 	}
 
 	public float getLooseClassCohesion() {
-		return looseClassCohesion;
+		return this.classMetrics.getLooseClassCohesion();
 	}
 
 	public void setTightClassCohesion(float tightClassCohesion) {
-		this.tightClassCohesion = tightClassCohesion;
+		this.classMetrics.setTightClassCohesion(tightClassCohesion);
 	}
 
 	public void setLooseClassCohesion(float looseClassCohesion) {
-		this.looseClassCohesion = looseClassCohesion;
+		this.classMetrics.setLooseClassCohesion(looseClassCohesion);
+	}
+
+	public int getCatchQty() {
+		return this.generalMetrics.getCatchQty();
+	}
+
+	public void setCatchQty(int catchQty) {
+		this.generalMetrics.setCatchQty(catchQty);
+	}
+
+	public int getNullCheckQty() {
+		return this.generalMetrics.getNullCheckQty();
+	}
+
+	public void setNullCheckQty(int nullCheckQty) {
+		this.generalMetrics.setNullCheckQty(nullCheckQty);
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		CKClassResult that = (CKClassResult) o;
 		return file.equals(that.file) &&
 				className.equals(that.className) &&
@@ -579,20 +533,8 @@ public class CKClassResult {
 		return Objects.hash(file, className, type);
 	}
 
-	public int getCatchQty() {
-		return catchQty;
+	@Override
+	public String toString() {
+		return "CKClassResult [file=" + file + ", className=" + className + "]";
 	}
-
-	public void setCatchQty(int catchQty) {
-		this.catchQty = catchQty;
-	}
-
-	public int getNullCheckQty() {
-		return nullCheckQty;
-	}
-
-	public void setNullCheckQty(int nullCheckQty) {
-		this.nullCheckQty = nullCheckQty;
-	}
-
 }

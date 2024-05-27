@@ -73,34 +73,29 @@ public class CK {
 		calculate(path.toString(), notifier);
 	}
 
-	/**
-	 * Calculate metrics for the passed javaFilePaths. Uses path to set the
-	 * environment
-	 * 
-	 * @param path          The environment to where the source code is located
-	 * @param notifier      Handle to process the results and handle errors
-	 * @param javaFilePaths The files to collect metrics of.
-	 */
-	public void calculate(Path path, CKNotifier notifier, Path... javaFilePaths) {
-		String[] srcDirs = FileUtils.getAllDirs(path.toString());
-		log.info(FOUND_MSG + srcDirs.length + " src dirs");
+	private String[] getSrcDirs(Path path) {
+		return FileUtils.getAllDirs(path.toString());
+	}
 
-		String[] allDependencies = useJars ? FileUtils.getAllJars(path.toString()) : null;
+	private String[] getAllDependencies(Path path){
+		return useJars ? FileUtils.getAllJars(path.toString()) : null;
+	}
 
-		if (useJars && allDependencies != null)
-			log.info(FOUND_MSG + allDependencies.length + " jar dependencies");
-
-		MetricsExecutor storage = new MetricsExecutor(classLevelMetrics, methodLevelMetrics, notifier);
-
+	private List<List<String>> getPartitions(Path path,  Path... javaFilePaths){
 		// Converts the paths to strings and makes the method support relative paths as
 		// well.
 		List<String> strJavaFilePaths = Stream.of(javaFilePaths)
 				.map(file -> file.isAbsolute() ? file.toString() : path.resolve(file).toString())
 				.collect(Collectors.toList());
 
-		List<List<String>> partitions = Lists.partition(strJavaFilePaths, maxAtOnce);
-		log.debug("Max partition size: " + maxAtOnce + ", total partitions=" + partitions.size());
+		return Lists.partition(strJavaFilePaths, maxAtOnce);
+	}
 
+	private MetricsExecutor getMetricsExecutor(CKNotifier notifier){
+		return new MetricsExecutor(classLevelMetrics, methodLevelMetrics, notifier);
+	}
+
+	private void fileParser(Path path, CKNotifier notifier, List<List<String>> partitions){
 		for (List<String> partition : partitions) {
 			log.debug("Next partition");
 			ASTParser parser = ASTParser.newParser(AST.JLS16);
@@ -111,10 +106,32 @@ public class CK {
 			Map<String, String> options = JavaCore.getOptions();
 			JavaCore.setComplianceOptions(JavaCore.VERSION_11, options);
 			parser.setCompilerOptions(options);
-			parser.setEnvironment(allDependencies, srcDirs, null, true);
-			parser.createASTs(partition.toArray(new String[partition.size()]), null, new String[0], storage, null);
+			parser.setEnvironment(getAllDependencies(path), getSrcDirs(path), null, true);
+			parser.createASTs(partition.toArray(new String[partition.size()]), null, new String[0], getMetricsExecutor(notifier), null);
 		}
 
+	}
+
+	/**
+	 * Calculate metrics for the passed javaFilePaths. Uses path to set the
+	 * environment
+	 * 
+	 * @param path          The environment to where the source code is located
+	 * @param notifier      Handle to process the results and handle errors
+	 * @param javaFilePaths The files to collect metrics of.
+	 */
+	public void calculate(Path path, CKNotifier notifier, Path... javaFilePaths) {
+		log.info(FOUND_MSG + getSrcDirs(path).length + " src dirs");
+
+		if (getAllDependencies(path) != null) {
+			log.info(FOUND_MSG + getAllDependencies(path).length + " jar dependencies");
+		}
+
+		List<List<String>> partitions = getPartitions(path, javaFilePaths);
+
+		log.debug("Max partition size: " + maxAtOnce + ", total partitions=" + partitions.size());
+			
+		fileParser(path, notifier, partitions);
 		log.info("Finished parsing");
 	}
 

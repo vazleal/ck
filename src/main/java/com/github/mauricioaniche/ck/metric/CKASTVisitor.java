@@ -4,7 +4,6 @@ import org.eclipse.jdt.core.dom.*;
 
 public interface CKASTVisitor {
 
-
 	default void visit(AnnotationTypeDeclaration node) {
 
 	}
